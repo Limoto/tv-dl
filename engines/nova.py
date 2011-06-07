@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # založeno na původním nova-dl
 __author__ = "Jakub Lužný"
