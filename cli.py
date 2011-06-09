@@ -45,13 +45,11 @@ def main():
 
         print(url)
         return
+    
+    outf = args.output if args.output else d[1]
+    download(d, outf)
 
-    if args.output:
-        d[1] = args.output
-
-    download(d)
-
-def download(d):
+def download(d, outf):
     if d[0] == 'rtmp':
         args = ''
         parms = d[2]
@@ -61,7 +59,7 @@ def download(d):
         if 'rtmpdump_args' in parms:
             args += ' '+parms['rtmpdump_args']
 
-        os.system('rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], d[1], args) )
+        os.system('rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outf, args) )
 
 
 main()
