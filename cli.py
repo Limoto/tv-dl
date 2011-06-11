@@ -42,6 +42,9 @@ def main():
 
         if 'playpath' in d[2]:
             url += ' playpath={}'.format(d[2]['playpath'])
+        
+        if 'app' in d[2]:
+            url += ' app={}'.format(d[2]['app'])
 
         print(url)
         return
@@ -54,7 +57,10 @@ def download(d, outf):
         args = ''
         parms = d[2]
         if 'playpath' in parms:
-            args = ' -y "{}"'.format(parms['playpath'])
+            args += ' -y "{}"'.format(parms['playpath'])
+            
+        if 'app' in parms:
+            args += ' -a "{}"'.format(parms['app'])
 
         if 'rtmpdump_args' in parms:
             args += ' '+parms['rtmpdump_args']

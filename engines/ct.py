@@ -8,6 +8,7 @@ __url__ = r"http://www\.ceskatelevize\.cz/ivysilani/.+"
 
 import re,os.path, urllib.request, urllib.parse, json, http.cookiejar
 from xml.dom.minidom import parseString as xml_parseString
+from urllib.parse import urlparse
 
 urlopen = urllib.request.urlopen
 
@@ -83,6 +84,7 @@ class CtEngine:
         base = self.movie.getAttribute('base')
         src = video.getAttribute('src')
         filename = os.path.basename( src)
+        app = urlparse(base).path[1:]
 
         # rtmpdump --live kvůli restartům - viz http://www.abclinuxu.cz/blog/pb/2011/5/televize-9-ctstream-3#18
-        return ('rtmp', filename, { 'url': base, 'playpath': src, 'rtmpdump_args' : '--live'} )
+        return ('rtmp', filename, { 'url': base, 'playpath': src, 'app' : app, 'rtmpdump_args' : '--live'} )
