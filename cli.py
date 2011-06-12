@@ -2,7 +2,9 @@
 
 import argparse,os,sys,re
 
-sys.path.append(os.getcwd())
+DATADIR = os.path.dirname( os.path.abspath(__file__) )
+
+sys.path.append(DATADIR)
 
 parser = argparse.ArgumentParser(description='Stahuje televizní pořady.')
 parser.add_argument('URL', action="store")
@@ -14,7 +16,7 @@ parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní
 args = parser.parse_args()
 engines = []
 def import_engines():
-    files = os.listdir('./engines')
+    files = os.listdir(DATADIR + '/engines')
     for file in files:
         if file[-3:] == '.py' and file[0] != '_':
             m = __import__("engines.{}".format(file[:-3]) )
