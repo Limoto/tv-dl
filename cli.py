@@ -2,7 +2,7 @@
 
 import argparse,os,sys,re
 
-DATADIR = os.path.dirname( os.path.abspath(__file__) )
+DATADIR = os.path.dirname( os.path.realpath( os.path.abspath(__file__) ) )
 
 sys.path.append(DATADIR)
 
