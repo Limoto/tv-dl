@@ -35,15 +35,19 @@ def main():
 
     if args.movie == "list":
         for m in e.movies():
-            print(m[0]+'\t'+m[1])
+            print(m[0]+'\t'+m[1], file=sys.stderr)
         return
 
     if args.quality == "list":
         for q in e.qualities():
-            print(q[0]+'\t'+q[1])
+            print(q[0]+'\t'+q[1], file=sys.stderr)
         return
 
     d = e.download(args.quality, args.movie)
+
+    if d[0] == 'error':
+        print("Chyba: "+d[1], file=sys.stderr)
+        return False
 
     if args.get_url:
         url = d[2]['url']
