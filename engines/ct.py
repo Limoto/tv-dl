@@ -69,6 +69,9 @@ class CtEngine:
             qualities.append( (q,q) )
 
         return qualities
+        
+    def movies(self):        
+        return [ ('0', re.findall(r'<title>(.+?) &mdash;', self.page)[0]) ]
 
     def get_video(self, quality):
         videos = self.movie.getElementsByTagName('video')
@@ -77,7 +80,7 @@ class CtEngine:
                 return video
 
         return videos[0]
-    def download(self, quality):
+    def download(self, quality, movie):
         video = self.get_video(quality)
 #    print(video.getAttribute('label'))
 

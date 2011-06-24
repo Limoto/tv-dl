@@ -12,10 +12,13 @@ from urllib.request import urlopen
 class NovaEngine:
 
     def __init__(self, url):
-        self.page = str( urlopen(url).read() )
+        self.page = urlopen(url).read().decode('utf-8')
 
     def qualities(self):
         return [ ("high", "Vysoká"), ("low", "Nízká") ]
+
+    def movies(self):        
+        return [ ('0', re.findall(r'<title>(.+?) - Voyo.cz', self.page)[0]) ]
 
     def get_lists(self):
 
@@ -38,7 +41,7 @@ class NovaEngine:
             if server.getAttribute('primary') == "true":
                 return ( server.getAttribute('url'), server.getAttribute('type') )
 
-    def download(self, quality):
+    def download(self, quality, movie):
         self.get_lists()
         if self.playlist.documentElement.tagName == "error":
             return ( "error", self.playlist.getElementsByTagName('message')[0].lastChild.wholeText.strip() )

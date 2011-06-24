@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser(description='Stahuje televizní pořady.')
 parser.add_argument('URL', action="store")
 parser.add_argument('-g', '--get-url', action="store_true", help="pouze vypíše URL a skončí")
 parser.add_argument('-q', '--quality', action="store", help="nastavuje kvalitu (list pro vypsání možností)")
+parser.add_argument('-m', '--movie', action="store", help="vybírá video ze stránky (list pro vypsání možností)")
 parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní soubor")
 
 
@@ -32,12 +33,17 @@ def main():
     import_engines()
     e = get_engine(args.URL)[2](args.URL)
 
+    if args.movie == "list":
+        for m in e.movies():
+            print(m[0]+'\t'+m[1])
+        return
+
     if args.quality == "list":
         for q in e.qualities():
             print(q[0]+'\t'+q[1])
         return
 
-    d = e.download(args.quality)
+    d = e.download(args.quality, args.movie)
 
     if args.get_url:
         url = d[2]['url']
