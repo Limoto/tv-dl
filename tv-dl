@@ -8,7 +8,7 @@ sys.path.append(DATADIR)
 
 parser = argparse.ArgumentParser(description='Stahuje televizní pořady.')
 parser.add_argument('URL', action="store")
-parser.add_argument('-g', '--get-url', action="store_true", help="pouze vypíše URL a skončí")
+parser.add_argument('-g', '--get-url', action="store_true", help="nestahuje, použe vypíše URL adresu videa (dá se použít v některých přehrávačích)")
 parser.add_argument('-q', '--quality', action="store", help="nastavuje kvalitu (list pro vypsání možností)")
 parser.add_argument('-m', '--movie', action="store", help="vybírá video ze stránky (list pro vypsání možností)")
 parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní soubor")
