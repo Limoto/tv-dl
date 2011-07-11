@@ -31,7 +31,7 @@ def flatten(obj, prefix = ''):
 class CtEngine:
 
     def __init__(self, url):
-        url = url.replace('/porady/', '/ivysilani/')
+        url = url.replace('/porady/', '/ivysilani/').replace('/video/', '')
         self.jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
         self.opener.addheaders = [('User-agent', 'Mozilla/5.0')]
