@@ -4,7 +4,7 @@
 
 __author__ = "Jakub Lužný"
 __desc__ = "ČT (iVysílání)"
-__url__ = r"http://www\.ceskatelevize\.cz/ivysilani/.+"
+__url__ = r"http://www\.ceskatelevize\.cz/(porady|ivysilani)/.+"
 
 import re,os.path, urllib.request, urllib.parse, json, http.cookiejar
 from xml.dom.minidom import parseString as xml_parseString
@@ -31,6 +31,7 @@ def flatten(obj, prefix = ''):
 class CtEngine:
 
     def __init__(self, url):
+        url = url.replace('/porady/', '/ivysilani/')
         self.jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
         self.opener.addheaders = [('User-agent', 'Mozilla/5.0')]
