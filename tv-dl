@@ -77,7 +77,9 @@ def download(d, outf):
         if 'rtmpdump_args' in parms:
             args += ' '+parms['rtmpdump_args']
 
-        os.system('rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outf, args) )
+        cmd = 'rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outf, args)
+        print('Spuštím '+cmd)
+        os.system(cmd)
 
 
 main()
