@@ -5,63 +5,63 @@ __author__ = "Jakub Lužný"
 __desc__ = "Nova (VOYO)"
 __url__ = r"http://voyo\.nova\.cz/.+"
 
-import re,os.path
-from xml.dom.minidom import parseString as xml_parseString
+import re,os.path, hashlib, base64
+import xml.etree.ElementTree as ElementTree
 from urllib.request import urlopen
+from urllib.parse import urlencode
+from datetime import datetime
 
 class NovaEngine:
 
     def __init__(self, url):
         self.page = urlopen(url).read().decode('utf-8')
-
+        self.get_playlist()
+        
     def qualities(self):
-        return [ ("high", "Vysoká"), ("low", "Nízká") ]
+        return [ ("mp4", "Vysoká"), ("flv", "Nízká") ]
 
     def movies(self):        
         return [ ('0', re.findall(r'<title>(.+?) - Voyo.cz', self.page)[0]) ]
 
-    def get_lists(self):
+    def get_playlist(self):
 
         self.media_id = re.search(r'var media_id = "(\d+)";', self.page ).group(1)
-        self.site_id = re.search(r'var site_id = (\d+);', self.page ).group(1)
+        d = datetime.now()
+        datestring = d.strftime("%Y%m%d%H%M%S")
+        
+        #šílenej hash... dostal jsem se k němu pomocí http://www.showmycode.com/ na 13-flowplayer.nacevi-3.1.5-02-002.swf
 
-        serverlist = urlopen("http://tn.nova.cz/bin/player/config.php?media_id=%s&site_id=%s" %(self.media_id, self.site_id) ).read()
-        playlist = urlopen("http://tn.nova.cz/bin/player/serve.php?media_id=%s&site_id=%s" %(self.media_id, self.site_id) ).read()
+        m = hashlib.md5()
+        m.update("nova-vod|{}|{}|tajne.heslo".format(self.media_id, datestring ).encode('utf-8'))
+        base64FromBA = base64.b64encode(m.digest(), " /".encode('utf-8'))
+        
+        get = urlencode( [ ('t', datestring),
+                           ('c', 'nova-vod|'+self.media_id),
+                           ('h', "0"),
+                           ('tm', 'nova'),
+                           ('s', base64FromBA),
+                           ('d', "1") ])
+                           
+        self.playlist = ElementTree.fromstring( urlopen('http://master-ng.nacevi.cz/cdn.server/PlayerLink.ashx?'+get).read().decode('utf-8') )
 
-        self.serverlist = xml_parseString(serverlist)
-        self.playlist = xml_parseString(playlist)
-
-    def get_server(self, id):
-        for server in self.serverlist.getElementsByTagName('flvserver'):
-            if server.getAttribute('id') == id:
-                return ( server.getAttribute('url'), server.getAttribute('type') )
-
-        #server nenalezen, použije se primární
-        for server in self.serverlist.getElementsByTagName('flvserver'):
-            if server.getAttribute('primary') == "true":
-                return ( server.getAttribute('url'), server.getAttribute('type') )
+    def get_video(self, quality):
+        for e in self.playlist.findall('mediaList/media'):
+            if e.find('quality').text == quality:
+                return e
 
     def download(self, quality, movie):
-        self.get_lists()
-        if self.playlist.documentElement.tagName == "error":
-            return ( "error", self.playlist.getElementsByTagName('message')[0].lastChild.wholeText.strip() )
+        if not quality:
+            quality = "mp4"
+        
+        baseUrl = self.playlist.find('baseUrl').text
+        print(baseUrl)
+        e = self.get_video(quality)
+        
+        playpath = e.find('url').text
+        
+        filename = os.path.basename(playpath)[:-3] + 'flv'
 
-        stream = self.playlist.getElementsByTagName('item')[0].getAttribute('src')
-        server_id = self.playlist.getElementsByTagName('item')[0].getAttribute('server')
+        return ("rtmp", filename , { 'url' : baseUrl,
+                                    'playpath' : playpath,
+                                    'rtmpdump_args' : '--live'})
 
-        url, type = self.get_server(server_id)
-
-        # RTMP
-        if type == 'stream':
-            if quality == 'low':
-                url += '?slist=' + stream
-            else:
-                url += '?slist=' + 'mp4:' + stream
-
-            filename = os.path.basename(stream) + '.flv'
-
-            return ("rtmp", filename, { 'url' : url} )
-
-        # HTTP
-        elif type == 'progressive':
-            return ( "error", "HTTP downloady nejsou podporovány")
