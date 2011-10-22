@@ -44,8 +44,8 @@ class BarrandovEngine:
         rtmp = 'rtmpe://' + hostname + '/' + playpath
   
         
-        filename = os.path.basename(playpath)[4:] #[:-3] + 'flv'
+        filename = os.path.basename(playpath)[4:-3] + 'flv'
 
         return ("rtmp", filename , { 'url' : rtmp,
-                                     'token' : '#ed%h0#w@1'},
-                                     'rtmpdump_args' : '--live')
+                                     'token' : '#ed%h0#w@1',
+                                     'rtmpdump_args' : '--live' } )
