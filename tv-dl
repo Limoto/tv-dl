@@ -73,6 +73,9 @@ def download(d, outf):
             
         if 'app' in parms:
             args += ' -a "{}"'.format(parms['app'])
+            
+        if 'token' in parms:
+            args += ' -T "{}"'.format(parms['token'])
 
         if 'rtmpdump_args' in parms:
             args += ' '+parms['rtmpdump_args']

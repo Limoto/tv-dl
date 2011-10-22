@@ -19,5 +19,9 @@ class DummyEngine:
         return [ ('0', 'Jedno video'), ('1', 'Druhý video') ]
 
     def download(self, quality, movie):
-        return ('rtmp', 'output.flv', {'url' : 'rtmp://server.net:port/appname/playpath', 'playpath' : 'opravdu/divnej/playpath', 'app' : 'opravdu/divná/aplikace', 'rtmpdump_args' : '--live'} )
+        return ('rtmp', 'output.flv', {'url' : 'rtmp://server.net:port/appname/playpath',
+                                       'playpath' : 'opravdu/divnej/playpath',
+                                       'app' : 'opravdu/divná/aplikace',
+                                       'rtmpdump_args' : '--live',
+                                       'token' : 'bezpečnostní_kód'} )
         return ('error', 'Slunci došel vodík')
