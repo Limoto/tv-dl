@@ -33,14 +33,14 @@ class BarrandovEngine:
 
     def download(self, quality, movie):
         if not quality:
-            quality = self.qualities()[0][0]
+            quality = 'low'
         
         playpath = self.playlist.find('streamname').text
         hostname = self.playlist.find('hostname').text
         if quality == 'high':
-            playpath.replace('500', '1000')
+            playpath = playpath.replace('500', '1000')
         elif quality == 'hd':
-            playpath.replace('500', 'HD')
+            playpath = playpath.replace('500', 'HD')
         
         rtmp = 'rtmpe://' + hostname + '/' + playpath
   
