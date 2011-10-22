@@ -32,7 +32,8 @@ class BarrandovEngine:
         return q
 
     def download(self, quality, movie):
-        quality = self.qualities()[0][0]
+        if not quality:
+            quality = self.qualities()[0][0]
         
         playpath = self.playlist.find('streamname').text
         hostname = self.playlist.find('hostname').text
