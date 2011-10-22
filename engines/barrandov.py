@@ -20,20 +20,20 @@ class BarrandovEngine:
   
     def qualities(self):
         q = []
-        
-        if self.playlist.find('hasquality').text == 'true':
-            q.append( ('high', 'Vysoká' ) )
-        
+                
         if self.playlist.find('hashdquality').text == 'true':
             q.append( ('hd', 'HD' ) )
 
+        if self.playlist.find('hasquality').text == 'true':
+            q.append( ('high', 'Vysoká' ) )
+        
         q.append( ('low', 'Nízká') )
 
         return q
 
     def download(self, quality, movie):
         if not quality:
-            quality = 'low'
+            quality = self.qualities()[0][0]
         
         playpath = self.playlist.find('streamname').text
         hostname = self.playlist.find('hostname').text
