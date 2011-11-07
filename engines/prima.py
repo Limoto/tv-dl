@@ -22,7 +22,10 @@ class PrimaEngine:
 
     def download(self, quality, movie):
         reg = r"LiveboxPlayer\.init\('embed_here.*?','\d+','\d+', '(.+\.mp4)', '(.+\.mp4)'"
-        hq, lq = re.findall(reg, self.page)[0]
+        r = re.findall(reg, self.page)
+        if not r:
+            r = re.findall( reg.replace('mp4', 'flv') , self.page)
+        hq, lq = r[0]
         
         playpath = ""
         if quality == "low":
