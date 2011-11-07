@@ -21,7 +21,7 @@ class PrimaEngine:
         return [ ('high', 'Vysoká'), ('low', 'Nízká')]
 
     def download(self, quality, movie):
-        reg = r"LiveboxPlayer\.init\('embed_here.*?','\d+','\d+', '(.+\.flv)', '(.+\.flv)'"
+        reg = r"LiveboxPlayer\.init\('embed_here.*?','\d+','\d+', '(.+\.mp4)', '(.+\.mp4)'"
         hq, lq = re.findall(reg, self.page)[0]
         
         playpath = ""
@@ -39,5 +39,5 @@ class PrimaEngine:
         
         baseUrl = re.findall( r"stream: '(.+?)'", player)[0]
 
-        return ("rtmp", playpath , { 'url' : baseUrl+'/'+playpath,
+        return ("rtmp", playpath[:-3]+'flv' , { 'url' : baseUrl+'/'+playpath,
                                      'rtmpdump_args' : '--live'})
