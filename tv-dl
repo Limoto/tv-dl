@@ -90,6 +90,10 @@ if __name__ == "__main__":
         log = logging.getLogger()
         log.setLevel(logging.DEBUG)
 
+    log.debug('')
+    log.debug('Arguments:')
+    for item in args.__dict__.items():
+        log.debug(' * {0} = {1}'.format(*item))
     
     downloader = TVDownloader(args)
     downloader.main()
