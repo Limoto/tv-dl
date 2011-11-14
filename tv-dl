@@ -8,12 +8,13 @@ class TVDownloader:
         self.engines = []
 
     def import_engines(self, directory):
-        files = os.listdir(directory)
-        for file in files:
-            if file[-3:] == '.py' and file[0] != '_':
-                m = __import__("engines.{}".format(file[:-3]) )
-                e = getattr(m, file[:-3])
-                self.engines.append( (e.__desc__, e.__url__, getattr(e, file[:-3].capitalize()+'Engine' ) ) )
+        names = [filename[:-3] for filename in os.listdir(directory)
+            if filename.endswith('.py') and not filename.startswith('_')]
+        engines = __import__("engines", fromlist=names)
+        for name in names:
+            module = getattr(engines, name)
+            engine = getattr(module, '{}Engine'.format(name.capitalize()))
+            self.engines.append((module.__desc__, module.__url__, engine))
     
     def get_engine(self, url):
         for e in self.engines:
@@ -22,7 +23,7 @@ class TVDownloader:
 
     def main(self):
         codedir = os.path.dirname(os.path.realpath(os.path.abspath(__file__)))
-        self.import_engines'{}/engines'.format(codedir))
+        self.import_engines('{}/engines'.format(codedir))
         e = self.get_engine(self.args.URL)[2](self.args.URL)
     
         if self.args.movie == "list":
