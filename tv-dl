@@ -39,7 +39,7 @@ class TVDownloader:
         d = e.download(self.args.quality, self.args.movie)
     
         if d[0] == 'error':
-            print("Chyba: "+d[1], file=sys.stderr)
+            log.error("Chyba: {}".format(d[1]), file=sys.stderr)
             return False
     
         if self.args.get_url:
@@ -73,7 +73,7 @@ class TVDownloader:
                 args += ' '+parms['rtmpdump_args']
     
             cmd = 'rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outfile, args)
-            print('Spoustim '+cmd)
+            log.info('Příkaz: {}'.format(cmd))
             os.system(cmd)
 
 if __name__ == "__main__":      
