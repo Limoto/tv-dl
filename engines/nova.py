@@ -10,6 +10,9 @@ import xml.etree.ElementTree as ElementTree
 from urllib.request import urlopen
 from urllib.parse import urlencode
 from datetime import datetime
+import logging
+
+log = logging.getLogger()
 
 class NovaEngine:
 
@@ -46,7 +49,9 @@ class NovaEngine:
 
     def get_video(self, quality):
         for e in self.playlist.findall('mediaList/media'):
-            if e.find('quality').text == quality:
+            q = e.find('quality').text
+            log.debug('Found quality: {}'.format(q))
+            if q == quality:
                 return e
 
     def download(self, quality, movie):
@@ -54,7 +59,7 @@ class NovaEngine:
             quality = "mp4"
         
         baseUrl = self.playlist.find('baseUrl').text
-        print(baseUrl)
+        log.debug('Base URL: {}'.format(baseUrl))
         e = self.get_video(quality)
         
         playpath = e.find('url').text
