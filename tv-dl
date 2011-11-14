@@ -86,6 +86,5 @@ if __name__ == "__main__":
     parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní soubor")
     args = parser.parse_args()
     
-    dwnl = TVDownloader(args)
-    
-    dwnl.main()
+    downloader = TVDownloader(args)
+    downloader.main()
