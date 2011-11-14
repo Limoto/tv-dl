@@ -54,12 +54,13 @@ class TVDownloader:
     
             print(url)
             return
-        
-        outf = self.args.output if self.args.output else os.path.join(os.path.expanduser("~/Movies"),d[1])
-        self.download(d, outf)
+       
+        prefix = '' # TODO xdg file structure?
+        outfile = self.args.output if self.args.output else os.path.join(prefix, d[1])
+        self.download(d, outfile)
     
     @classmethod
-    def download(cls, d, outf):
+    def download(cls, d, outfile):
         if d[0] == 'rtmp':
             args = ''
             parms = d[2]
@@ -72,7 +73,7 @@ class TVDownloader:
             if 'rtmpdump_args' in parms:
                 args += ' '+parms['rtmpdump_args']
     
-            cmd = '{}/bin/rtmpdump -r "{}" -o "{}" {}'.format(os.path.expanduser("~"),parms['url'], outf, args)
+            cmd = 'rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outfile, args)
             print('Spoustim '+cmd)
             os.system(cmd)
 
