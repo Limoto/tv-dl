@@ -83,17 +83,23 @@ if __name__ == "__main__":
     parser.add_argument('-q', '--quality', action="store", help="nastavuje kvalitu (list pro vypsání možností)")
     parser.add_argument('-m', '--movie', action="store", help="vybírá video ze stránky (list pro vypsání možností)")
     parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní soubor")
-    parser.add_argument('-D', '--debug', action="store_true", help="zapíná debugovací zprávy")
+    parser.add_argument('-v', '--verbose', action="store_const",
+        dest='loglevel', const=logging.INFO,
+        help="zapíná informativní zprávy")
+    parser.add_argument('-D', '--debug', action="store_const",
+        dest='loglevel', const=logging.DEBUG,
+        help="zapíná debugovací zprávy")
+    parser.set_defaults(loglevel=logging.WARNING)
     args = parser.parse_args()
 
-    if args.debug:
-        log = logging.getLogger()
-        log.setLevel(logging.DEBUG)
+    log = logging.getLogger()
+    log.setLevel(args.loglevel)
 
     log.debug('')
     log.debug('Arguments:')
     for item in args.__dict__.items():
         log.debug(' * {0} = {1}'.format(*item))
+    log.debug('')
     
     downloader = TVDownloader(args)
     downloader.main()
