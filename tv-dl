@@ -1,88 +1,105 @@
 #!/usr/bin/env python3
 
-import argparse,os,sys,re
+import argparse,os,sys,re,logging
 
-DATADIR = os.path.dirname( os.path.realpath( os.path.abspath(__file__) ) )
+class TVDownloader:
+    def __init__(self, args):
+        self.args = args
+        self.engines = []
 
-sys.path.append(DATADIR)
-
-parser = argparse.ArgumentParser(description='Stahuje televizní pořady.')
-parser.add_argument('URL', action="store")
-parser.add_argument('-g', '--get-url', action="store_true", help="nestahuje, použe vypíše URL adresu videa (dá se použít v některých přehrávačích)")
-parser.add_argument('-q', '--quality', action="store", help="nastavuje kvalitu (list pro vypsání možností)")
-parser.add_argument('-m', '--movie', action="store", help="vybírá video ze stránky (list pro vypsání možností)")
-parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní soubor")
-
-
-args = parser.parse_args()
-engines = []
-def import_engines():
-    files = os.listdir(DATADIR + '/engines')
-    for file in files:
-        if file[-3:] == '.py' and file[0] != '_':
-            m = __import__("engines.{}".format(file[:-3]) )
-            e = getattr(m, file[:-3])
-            engines.append( (e.__desc__, e.__url__, getattr(e, file[:-3].capitalize()+'Engine' ) ) )
-
-def get_engine(url):
-    for e in engines:
-        if re.match(e[1], url):
-            return e
-
-def main():
-    import_engines()
-    e = get_engine(args.URL)[2](args.URL)
-
-    if args.movie == "list":
-        for m in e.movies():
-            print(m[0]+'\t'+m[1], file=sys.stderr)
-        return
-
-    if args.quality == "list":
-        for q in e.qualities():
-            print(q[0]+'\t'+q[1], file=sys.stderr)
-        return
-
-    d = e.download(args.quality, args.movie)
-
-    if d[0] == 'error':
-        print("Chyba: "+d[1], file=sys.stderr)
-        return False
-
-    if args.get_url:
-        url = d[2]['url']
-
-        if 'playpath' in d[2]:
-            url += ' playpath={}'.format(d[2]['playpath'])
-        
-        if 'app' in d[2]:
-            url += ' app={}'.format(d[2]['app'])
-
-        print(url)
-        return
+    def import_engines(self, directory):
+        names = [filename[:-3] for filename in os.listdir(directory)
+            if filename.endswith('.py') and not filename.startswith('_')]
+        engines = __import__("engines", fromlist=names)
+        for name in names:
+            module = getattr(engines, name)
+            engine = getattr(module, '{}Engine'.format(name.capitalize()))
+            self.engines.append((module.__desc__, module.__url__, engine))
     
-    outf = args.output if args.output else d[1]
-    download(d, outf)
+    def get_engine(self, url):
+        for e in self.engines:
+            if re.match(e[1], url):
+                return e
 
-def download(d, outf):
-    if d[0] == 'rtmp':
-        args = ''
-        parms = d[2]
-        if 'playpath' in parms:
-            args += ' -y "{}"'.format(parms['playpath'])
+    def main(self):
+        codedir = os.path.dirname(os.path.realpath(os.path.abspath(__file__)))
+        self.import_engines('{}/engines'.format(codedir))
+        e = self.get_engine(self.args.URL)[2](self.args.URL)
+    
+        if self.args.movie == "list":
+            for m in e.movies():
+                print(m[0]+'\t'+m[1], file=sys.stderr)
+            return
+    
+        if self.args.quality == "list":
+            for q in e.qualities():
+                print(q[0]+'\t'+q[1], file=sys.stderr)
+            return
+    
+        d = e.download(self.args.quality, self.args.movie)
+    
+        if d[0] == 'error':
+            log.error("Chyba: {}".format(d[1]), file=sys.stderr)
+            return False
+    
+        if self.args.get_url:
+            url = d[2]['url']
+    
+            if 'playpath' in d[2]:
+                url += ' playpath={}'.format(d[2]['playpath'])
             
-        if 'app' in parms:
-            args += ' -a "{}"'.format(parms['app'])
-            
-        if 'token' in parms:
-            args += ' -T "{}"'.format(parms['token'])
+            if 'app' in d[2]:
+                url += ' app={}'.format(d[2]['app'])
+    
+            print(url)
+            return
+       
+        prefix = '' # TODO xdg file structure?
+        outfile = self.args.output if self.args.output else os.path.join(prefix, d[1])
+        self.download(d, outfile)
+    
+    @classmethod
+    def download(cls, d, outfile):
+        if d[0] == 'rtmp':
+            args = ''
+            parms = d[2]
+            if 'playpath' in parms:
+                args += ' -y "{}"'.format(parms['playpath'])
+                
+            if 'app' in parms:
+                args += ' -a "{}"'.format(parms['app'])
+    
+            if 'rtmpdump_args' in parms:
+                args += ' '+parms['rtmpdump_args']
+    
+            cmd = 'rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outfile, args)
+            log.info('Příkaz: {}'.format(cmd))
+            os.system(cmd)
 
-        if 'rtmpdump_args' in parms:
-            args += ' '+parms['rtmpdump_args']
+if __name__ == "__main__":      
+    parser = argparse.ArgumentParser(description='Stahuje televizní pořady.')
+    parser.add_argument('URL', action="store")
+    parser.add_argument('-g', '--get-url', action="store_true", help="nestahuje, použe vypíše URL adresu videa (dá se použít v některých přehrávačích)")
+    parser.add_argument('-q', '--quality', action="store", help="nastavuje kvalitu (list pro vypsání možností)")
+    parser.add_argument('-m', '--movie', action="store", help="vybírá video ze stránky (list pro vypsání možností)")
+    parser.add_argument('-o', '--output', action="store", help="nastavuje výstupní soubor")
+    parser.add_argument('-v', '--verbose', action="store_const",
+        dest='loglevel', const=logging.INFO,
+        help="zapíná informativní zprávy")
+    parser.add_argument('-D', '--debug', action="store_const",
+        dest='loglevel', const=logging.DEBUG,
+        help="zapíná debugovací zprávy")
+    parser.set_defaults(loglevel=logging.WARNING)
+    args = parser.parse_args()
 
-        cmd = 'rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outf, args)
-        print('Spuštím '+cmd)
-        os.system(cmd)
+    log = logging.getLogger()
+    log.setLevel(args.loglevel)
 
-
-main()
+    log.debug('')
+    log.debug('Arguments:')
+    for item in args.__dict__.items():
+        log.debug(' * {0} = {1}'.format(*item))
+    log.debug('')
+    
+    downloader = TVDownloader(args)
+    downloader.main()
