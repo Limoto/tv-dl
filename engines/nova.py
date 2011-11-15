@@ -48,11 +48,12 @@ class NovaEngine:
         self.playlist = ElementTree.fromstring( urlopen('http://master-ng.nacevi.cz/cdn.server/PlayerLink.ashx?'+get).read().decode('utf-8') )
 
     def get_video(self, quality):
-        for e in self.playlist.findall('mediaList/media'):
-            q = e.find('quality').text
-            log.debug('Found quality: {}'.format(q))
-            if q == quality:
-                return e
+        items = [(e.find('quality').text, e) for e in self.playlist.findall('mediaList/media')]
+        log.debug('Varianty: {}'.format(', '.join(q for q, e in items)))
+        if len(items) == 0:
+            log.error('Není k dispozici žádná varianta videa.')
+            exit(1)
+        return dict(items).get(quality, items[0][1])
 
     def download(self, quality, movie):
         if not quality:
