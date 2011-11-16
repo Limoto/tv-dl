@@ -92,8 +92,8 @@ if __name__ == "__main__":
     parser.set_defaults(loglevel=logging.WARNING)
     args = parser.parse_args()
 
+    logging.basicConfig(level=args.loglevel, style='{', format='{message}')
     log = logging.getLogger()
-    log.setLevel(args.loglevel)
 
     log.debug('')
     log.debug('Arguments:')
