@@ -15,7 +15,10 @@ import logging
 log = logging.getLogger()
 
 class NovaEngine:
-
+    
+    quality_names = {'hq' : 'Vysoká',
+                     'lq' : 'Nízká' }
+    
     def __init__(self, url):
         self.page = urlopen(url).read().decode('utf-8')
         self.get_playlist()
@@ -23,19 +26,14 @@ class NovaEngine:
         self.medias = [(e.find('quality').text, e) for e in self.playlist.findall('mediaList/media')]
         log.debug('Varianty: {}'.format(', '.join(q for q, e in self.medias)))        
         if len(self.medias) == 0:
-            log.error('Není k dispozici žádná varianta videa.')
+            raise ValueError('Není k dispozici žádná varianta videa.')
         
     def qualities(self):
         q = []
         
         for e in self.medias:
-            name = e[0]
-            if name == "hq":
-                desc = "Vysoká"
-            elif name == "lq":
-                desc = "Nízká"
-            else:
-                desc = name
+            name = e[0]            
+            desc = self.quality_names.get(name, name)
             q.append( (name, desc) )
         
         return q
@@ -64,13 +62,18 @@ class NovaEngine:
         self.playlist = ElementTree.fromstring( urlopen('http://master-ng.nacevi.cz/cdn.server/PlayerLink.ashx?'+get).read().decode('utf-8') )
       
     def get_video(self, quality):
-        try:
-            e = dict(self.medias)[quality]
-            log.info('Vybraná varianta: {}'.format(quality))
-            return e
-        except KeyError:
-            q, e = self.medias[0]
-            log.warning('Není k dispozici požadovaná varianta videa. Použije se {}.'.format(q))
+        if quality:
+            try:
+                e = dict(self.medias)[quality]
+                log.info('Vybraná varianta: {}'.format(quality))
+                return e
+            except:
+                raise ValueError('Není k dispozici žádná varianta videa.')
+         
+        else:
+            quality, e = self.medias[0]
+            log.info('Automaticky vybraná varianta: {}'.format(quality))
+
             return e
 
     def download(self, quality, movie):

@@ -106,3 +106,5 @@ if __name__ == "__main__":
         downloader.main()
     except KeyboardInterrupt:
         pass
+    except ValueError as e:
+        log.error(e)
