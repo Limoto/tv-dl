@@ -20,14 +20,30 @@ class NovaEngine:
         self.page = urlopen(url).read().decode('utf-8')
         self.get_playlist()
         
+        self.medias = [(e.find('quality').text, e) for e in self.playlist.findall('mediaList/media')]
+        log.debug('Varianty: {}'.format(', '.join(q for q, e in self.medias)))        
+        if len(self.medias) == 0:
+            log.error('Není k dispozici žádná varianta videa.')
+        
     def qualities(self):
-        return [ ("mp4", "Vysoká"), ("flv", "Nízká") ]
+        q = []
+        
+        for e in self.medias:
+            name = e[0]
+            if name == "hq":
+                desc = "Vysoká"
+            elif name == "lq":
+                desc = "Nízká"
+            else:
+                desc = name
+            q.append( (name, desc) )
+        
+        return q
 
     def movies(self):        
         return [ ('0', re.findall(r'<title>(.+?) - Voyo.cz', self.page)[0]) ]
 
-    def get_playlist(self):
-
+    def get_playlist(self):        
         self.media_id = re.search(r'var media_id = "(\d+)";', self.page ).group(1)
         d = datetime.now()
         datestring = d.strftime("%Y%m%d%H%M%S")
@@ -46,25 +62,18 @@ class NovaEngine:
                            ('d', "1") ])
                            
         self.playlist = ElementTree.fromstring( urlopen('http://master-ng.nacevi.cz/cdn.server/PlayerLink.ashx?'+get).read().decode('utf-8') )
-
+      
     def get_video(self, quality):
-        items = [(e.find('quality').text, e) for e in self.playlist.findall('mediaList/media')]
-        log.debug('Varianty: {}'.format(', '.join(q for q, e in items)))
-        if len(items) == 0:
-            log.error('Není k dispozici žádná varianta videa.')
-            exit(1)
         try:
-            e = dict(items)[quality]
+            e = dict(self.medias)[quality]
             log.info('Vybraná varianta: {}'.format(quality))
             return e
         except KeyError:
-            q, e = items[0]
+            q, e = self.medias[0]
             log.warning('Není k dispozici požadovaná varianta videa. Použije se {}.'.format(q))
             return e
 
     def download(self, quality, movie):
-        if not quality:
-            quality = "mp4"
         
         baseUrl = self.playlist.find('baseUrl').text
         log.debug('Base URL: {}'.format(baseUrl))
