@@ -6,9 +6,11 @@ __author__ = "Jakub Lužný"
 __desc__ = "ČT (iVysílání)"
 __url__ = r"http://www\.ceskatelevize\.cz/(porady|ivysilani)/.+"
 
-import re,os.path, urllib.request, urllib.parse, json, http.cookiejar
-from xml.dom.minidom import parseString as xml_parseString
+import re,os.path, urllib.request, urllib.parse, json, http.cookiejar, logging
+import xml.etree.ElementTree as ElementTree
 from urllib.parse import urlparse
+
+log = logging.getLogger()
 
 urlopen = urllib.request.urlopen
 
@@ -43,50 +45,46 @@ class CtEngine:
         data = flatten(data['options'], 'options')
         data = urllib.parse.urlencode( data, 'utf-8')
         req = urllib.request.Request('http://www.ceskatelevize.cz/ajax/playlistURL.php', bytes(data, 'utf-8') )
-#    req.add_header('Referer', url)
-
 
         pl_url = urlopen(req).read().decode('utf-8')
-#    print(pl_url)
 
         self.playlist = urlopen(pl_url).read().decode('utf-8')
-#    print(self.playlist)
         self.getMovie()
-#    print(self.movie.getAttribute('id'))
+        self.videos = self.movie.findall('video')
+        if len(self.videos) == 0:
+            raise ValueError('Není k dispozici žádná kvalita videa.')
 
     def getMovie(self):
-        xml = xml = xml_parseString(self.playlist)
+        xml = ElementTree.fromstring(self.playlist) 
 
-        for e in xml.getElementsByTagName('switchItem'):
-            if not 'AD'  in e.getAttribute('id'):
+        for e in xml.findall('smilRoot/body/switchItem'):
+            if not 'AD'  in e.get('id'):
                 self.movie = e
                 break
 
     def qualities(self):
-        qualities = []
-
-        for video in self.movie.getElementsByTagName('video'):
-            q = video.getAttribute('label')
-            qualities.append( (q,q) )
-
-        return qualities
-        
+        return [( v.get('label'), v.get('label') ) for v in self.videos]
+      
     def movies(self):        
         return [ ('0', re.findall(r'<title>(.+?) &mdash;', self.page)[0]) ]
 
     def get_video(self, quality):
-        videos = self.movie.getElementsByTagName('video')
-        for video in videos:
-            if video.getAttribute('label') == quality:
+        for video in self.videos:
+            if video.get('label') == quality:
+                log.info('Vybraná kvalita: {}'.format(quality))
                 return video
-
-        return videos[0]
+                
+        raise ValueError('Není k dispozici zadaná kvalita videa.')
+                
     def download(self, quality, movie):
-        video = self.get_video(quality)
-#    print(video.getAttribute('label'))
+        if quality:
+            video = self.get_video(quality)
+        else:
+            video = self.videos[0]
+            log.info('Automaticky vybraná kvalita: {}'.format(video.get('label')) )
 
-        base = self.movie.getAttribute('base')
-        src = video.getAttribute('src')
+        base = self.movie.get('base')
+        src = video.get('src')
         filename = os.path.basename( src)
         app = urlparse(base).path[1:]
 
