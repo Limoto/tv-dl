@@ -21,7 +21,7 @@ class PrimaEngine:
         return [ ('high', 'Vysoká'), ('low', 'Nízká')]
 
     def download(self, quality, movie):
-        reg = r"LiveboxPlayer\.init\('embed_here.*?','\d+','\d+', '(.+\.mp4)', '(.+\.mp4)'"
+        reg = r"LiveboxPlayer\.init\('embed_here.*?',.+?,.+?, '(.+\.mp4)', '(.+\.mp4)'"
         r = re.findall(reg, self.page)
         if not r:
             r = re.findall( reg.replace('mp4', 'flv') , self.page)
