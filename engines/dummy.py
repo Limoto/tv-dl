@@ -24,4 +24,6 @@ class DummyEngine:
                                        'app' : 'opravdu/divná/aplikace',
                                        'rtmpdump_args' : '--live',
                                        'token' : 'bezpečnostní_kód'} )
+        
+        return ('http', 'output.flv', {'url' : 'http://televize.tv/archiv/porad.flv' } )
         return ('error', 'Slunci došel vodík')

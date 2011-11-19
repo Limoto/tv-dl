@@ -60,6 +60,7 @@ class TVDownloader:
     
     @classmethod
     def download(cls, d, outfile):
+        cmd = ''
         if d[0] == 'rtmp':
             args = ''
             parms = d[2]
@@ -73,8 +74,16 @@ class TVDownloader:
                 args += ' '+parms['rtmpdump_args']
     
             cmd = 'rtmpdump -r "{}" -o "{}" {}'.format(parms['url'], outfile, args)
-            log.info('Příkaz: {}'.format(cmd))
-            os.system(cmd)
+    
+        elif d[0] == 'http':
+            cmd = 'wget -O "{}" "{}"'.format(d[1], d[2]['url'] )
+            
+        else:
+            raise ValueError("Nepodporovaný protokol: {}".format(d[0]) )
+            
+        log.info('Příkaz: {}'.format(cmd))
+        os.system(cmd)
+            
 
 if __name__ == "__main__":      
     parser = argparse.ArgumentParser(description='Stahuje televizní pořady.')
