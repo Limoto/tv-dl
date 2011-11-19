@@ -24,9 +24,9 @@ class NovaEngine:
         self.get_playlist()
         
         self.medias = [(e.find('quality').text, e) for e in self.playlist.findall('mediaList/media')]
-        log.debug('Varianty: {}'.format(', '.join(q for q, e in self.medias)))        
+        log.debug('Kvality: {}'.format(', '.join(q for q, e in self.medias)))        
         if len(self.medias) == 0:
-            raise ValueError('Není k dispozici žádná varianta videa.')
+            raise ValueError('Není k dispozici žádná kvalita videa.')
         
     def qualities(self):
         q = []
@@ -65,14 +65,14 @@ class NovaEngine:
         if quality:
             try:
                 e = dict(self.medias)[quality]
-                log.info('Vybraná varianta: {}'.format(quality))
+                log.info('Vybraná kvalita: {}'.format(quality))
                 return e
             except:
-                raise ValueError('Není k dispozici žádná varianta videa.')
+                raise ValueError('Není k dispozici zadaná kvalita videa.')
          
         else:
             quality, e = self.medias[0]
-            log.info('Automaticky vybraná varianta: {}'.format(quality))
+            log.info('Automaticky vybraná kvalita: {}'.format(quality))
 
             return e
 
