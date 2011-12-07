@@ -38,9 +38,11 @@ class CtEngine:
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
         self.opener.addheaders = [('User-agent', 'Mozilla/5.0')]
         urllib.request.install_opener(self.opener)
-        self.page = urlopen(url).read().decode('utf-8')
+        
+        self.b_page = urlopen(url).read()  # .decode('utf-8')
 
-        data = re.findall(r"callSOAP\((.+?)\);", self.page)[0]
+        data = re.findall(b"callSOAP\((.+?)\);", self.b_page)[0]
+        data = data.decode('utf-8')
         data = json.loads(data)
         data = flatten(data['options'], 'options')
         data = urllib.parse.urlencode( data, 'utf-8')
@@ -66,7 +68,7 @@ class CtEngine:
         return [( v.get('label'), v.get('label') ) for v in self.videos]
       
     def movies(self):        
-        return [ ('0', re.findall(r'<title>(.+?) &mdash;', self.page)[0]) ]
+        return [ ('0', re.findall(b'<title>(.+?) &mdash;', self.b_page)[0].decode('utf-8')) ]
 
     def get_video(self, quality):
         for video in self.videos:
