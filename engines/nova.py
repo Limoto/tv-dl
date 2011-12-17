@@ -42,7 +42,7 @@ class NovaEngine:
         return [ ('0', re.findall(r'<title>(.+?) - Voyo.cz', self.page)[0]) ]
 
     def get_playlist(self):        
-        self.media_id = re.search(r'var media_id = "(\d+)";', self.page ).group(1)
+        self.media_id = re.search(r'mainVideo = new mediaData\(\d+, \d+, (\d+),', self.page ).group(1)
         d = datetime.now()
         datestring = d.strftime("%Y%m%d%H%M%S")
         
