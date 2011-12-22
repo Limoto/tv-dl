@@ -69,7 +69,7 @@ class PrimaEngine:
         req = Request(playerUrl, None, {'Referer' : self.url} )
         player = urlopen(req).read().decode('utf-8')
         
-        baseUrl = re.findall( r"stream: '(.+?)'", player)[0]
+        baseUrl = ''.join( re.findall( r"stream: '(.+?)'.*'(\?auth.+)'", player)[0] )
 
         return ("rtmp", playpath[:-3]+'flv' , { 'url' : baseUrl+'/'+playpath,
                                      'rtmpdump_args' : '--live'})
