@@ -6,6 +6,8 @@ class TVDownloader:
     def __init__(self, args):
         self.args = args
         self.engines = []
+        self.codedir = os.path.dirname(os.path.realpath(os.path.abspath(__file__)))
+        sys.path.append(self.codedir) 
 
     def import_engines(self, directory):
         names = [filename[:-3] for filename in os.listdir(directory)
@@ -22,8 +24,7 @@ class TVDownloader:
                 return e
 
     def main(self):
-        codedir = os.path.dirname(os.path.realpath(os.path.abspath(__file__)))
-        self.import_engines('{}/engines'.format(codedir))
+        self.import_engines(os.path.join(self.codedir, 'engines'))
         e = self.get_engine(self.args.URL)[2](self.args.URL)
     
         if self.args.movie == "list":
