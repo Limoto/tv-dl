@@ -29,6 +29,24 @@ def flatten(obj, prefix = ''):
         out.append( (prefix, obj) )
 
     return out
+    
+def srt_time(time):
+    time = int(time)
+    sec = time / 1000
+    msec = time % 1000
+    hour = sec / 3600
+    sec = sec % 3600
+    min = sec / 60
+    sec = sec % 60
+    return "{:02}:{:02}:{:02},{:03}".format(int(hour), int(min), int(sec), msec)
+    
+def txt_to_srt(txt):
+    subs = re.findall('\s*(\d+); (\d+) (\d+)\n(.+?)\n\n', txt, re.DOTALL)
+    srt = ''
+    for s in subs:
+        srt += "{}\n{} --> {}\n{}\n\n".format(s[0], srt_time(s[1]), srt_time(s[2]), s[3] )
+    
+    return srt
 
 class CtEngine:
 
@@ -55,7 +73,7 @@ class CtEngine:
         self.videos = self.movie.findall('video')
         if len(self.videos) == 0:
             raise ValueError('Není k dispozici žádná kvalita videa.')
-
+        
     def getMovie(self):
         xml = ElementTree.fromstring(self.playlist) 
 
@@ -63,9 +81,16 @@ class CtEngine:
             if not 'AD'  in e.get('id'):
                 self.movie = e
                 break
+        
+        self.subtitles = None
+        for e in xml.findall('metaDataRoot/Playlist/PlaylistItem'):
+            if e.get('id') == self.movie.get('id'):
+                s = e.find('SubtitlesURL')
+                if s is not None:
+                    self.subtitles = s.text
 
     def qualities(self):
-        return [( v.get('label'), v.get('label') ) for v in self.videos]
+        return ([('srt', 'Titulky')] if self.subtitles is not None else [] ) + [( v.get('label'), v.get('label') ) for v in self.videos]
       
     def movies(self):        
         return [ ('0', re.findall(b'<title>(.+?) &mdash;', self.b_page)[0].decode('utf-8')) ]
@@ -79,6 +104,8 @@ class CtEngine:
         raise ValueError('Není k dispozici zadaná kvalita videa.')
                 
     def download(self, quality, movie):
+        if quality == 'srt':
+            return self.download_srt()
         if quality:
             video = self.get_video(quality)
         else:
@@ -92,3 +119,12 @@ class CtEngine:
 
         # rtmpdump --live kvůli restartům - viz http://www.abclinuxu.cz/blog/pb/2011/5/televize-9-ctstream-3#18
         return ('rtmp', filename, { 'url': base, 'playpath': src, 'app' : app, 'rtmpdump_args' : '--live'} )
+        
+    def download_srt(self):
+        if self.subtitles is None:
+            raise ValueError('Titulky nejsou k dispozici.')
+        
+        txt = urllib.request.urlopen(self.subtitles).read().decode('utf8')
+        srt = txt_to_srt(txt)
+        return ('text', 'subtitles.srt', srt.encode('cp1250') )
+        

@@ -82,6 +82,9 @@ class TVDownloader:
         elif d[0] == 'http':
             cmd = 'wget -O "{}" "{}"'.format(d[1], d[2]['url'] )
             
+        elif d[0] == "text":
+            open(outfile, 'wb').write(d[2])
+            
         else:
             raise ValueError("Nepodporovaný protokol: {}".format(d[0]) )
             
