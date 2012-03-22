@@ -22,6 +22,7 @@ class TVDownloader:
         for e in self.engines:
             if re.match(e[1], url):
                 return e
+        raise ValueError("Nebyl nalezen žádný engine podporující tuto URL")
 
     def main(self):
         self.import_engines(os.path.join(self.codedir, 'engines'))
