@@ -2,7 +2,7 @@
 #
 __author__ = "Jakub Lužný"
 __desc__ = "TV Prima Videoarchiv"
-__url__ = r"http://(www.)?iprima\.cz/videoarchiv.*"
+__url__ = r"http://play\.iprima\.cz/.*"
 
 import re,os.path,random,math,logging
 import xml.etree.ElementTree as ElementTree
@@ -50,11 +50,9 @@ class PrimaEngine:
             return self.download_cdn()
             
     def download_rtmp(self, quality):
-        reg = r"LiveboxPlayer\.init\('embed_here.*?',.+?,.+?, '(.+\.mp4)', '(.+\.mp4)'"
-        r = re.findall(reg, self.page)
-        if not r:
-            r = re.findall( reg.replace('mp4', 'flv') , self.page)
-        hq, lq = r[0]
+        
+        hq = re.findall( r"'hq_id':'(.+?)'", self.page)[0]
+        lq = re.findall( r"'lq_id':'(.+?)'", self.page)[0]
         
         playpath = ""
         if quality == "low":
@@ -62,14 +60,14 @@ class PrimaEngine:
         else:
             playpath = hq
 
-        playerUrl = 'http://embed.livebox.cz/iprima/player-1.js?__tok{}__={}'.format(
+        playerUrl = 'http://embed.livebox.cz/iprimaplay/player-embed-v2.js?__tok{}__={}'.format(
                          math.floor(random.random()*1073741824),
                          math.floor(random.random()*1073741824))
         
         req = Request(playerUrl, None, {'Referer' : self.url} )
         player = urlopen(req).read().decode('utf-8')
         
-        baseUrl = ''.join( re.findall( r"stream: '(.+?)'.*'(\?auth.+)'", player)[0] )
+        baseUrl = ''.join( re.findall( r"embed\['stream'\] = '(.+?)'.+'(\?auth=.+?)';", player)[0] )
 
         return ("rtmp", playpath[:-3]+'flv' , { 'url' : baseUrl+'/'+playpath,
                                      'rtmpdump_args' : '--live'})
