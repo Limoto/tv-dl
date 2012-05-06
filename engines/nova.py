@@ -43,14 +43,17 @@ class NovaEngine:
 
     def get_playlist(self):        
         self.media_id = re.search(r'mainVideo = new mediaData\(\d+, \d+, (\d+),', self.page ).group(1)
+        log.debug('Nalezeno media ID: {}'.format(self.media_id) )
         d = datetime.now()
-        datestring = d.strftime("%Y%m%d%H%M%S")
+        #datestring = d.strftime("%Y%m%d%H%M%S")
+        datestring = urlopen("http://tn.nova.cz/lbin/time.php").read().decode('utf-8')[0:14]
         
         #šílenej hash... dostal jsem se k němu pomocí http://www.showmycode.com/ na 13-flowplayer.nacevi-3.1.5-02-002.swf
 
         m = hashlib.md5()
-        m.update("nova-vod|{}|{}|tajne.heslo".format(self.media_id, datestring ).encode('utf-8'))
-        base64FromBA = base64.b64encode(m.digest(), " /".encode('utf-8'))
+        m.update("nova-vod|{}|{}|chttvg.jkfrwm57".format(self.media_id, datestring ).encode('utf-8'))
+        print(m.hexdigest() )
+        base64FromBA = base64.b64encode(m.digest() ) #, " /".encode('utf-8'))
         
         get = urlencode( [ ('t', datestring),
                            ('c', 'nova-vod|'+self.media_id),
@@ -59,7 +62,12 @@ class NovaEngine:
                            ('s', base64FromBA),
                            ('d', "1") ])
                            
-        self.playlist = ElementTree.fromstring( urlopen('http://master-ng.nacevi.cz/cdn.server/PlayerLink.ashx?'+get).read().decode('utf-8') )
+        playlist_url = 'http://master-ng.nacevi.cz/cdn.server/PlayerLink.ashx?'+get
+        
+        log.debug("Získávám playlist z URL: "+playlist_url)
+        playlist = urlopen(playlist_url).read().decode('utf-8')
+        self.playlist = ElementTree.fromstring( playlist )
+        print(playlist)
       
     def get_video(self, quality):
         if quality:
