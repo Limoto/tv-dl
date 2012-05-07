@@ -52,7 +52,6 @@ class NovaEngine:
 
         m = hashlib.md5()
         m.update("nova-vod|{}|{}|chttvg.jkfrwm57".format(self.media_id, datestring ).encode('utf-8'))
-        print(m.hexdigest() )
         base64FromBA = base64.b64encode(m.digest() ) #, " /".encode('utf-8'))
         
         get = urlencode( [ ('t', datestring),
@@ -67,7 +66,6 @@ class NovaEngine:
         log.debug("Získávám playlist z URL: "+playlist_url)
         playlist = urlopen(playlist_url).read().decode('utf-8')
         self.playlist = ElementTree.fromstring( playlist )
-        print(playlist)
       
     def get_video(self, quality):
         if quality:
