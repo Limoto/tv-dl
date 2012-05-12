@@ -1,0 +1,59 @@
+Tv-dl
+=====
+
+Slouží ke stahování videí z archivu převážně českých televizí.
+
+Závislosti
+----------
+
+* Python >= 3.2
+* rtmpdump (http://rtmpdump.mplayerhq.hu/)
+
+Podporované archivy
+-------------------
+
+* ČT iVysílání (http://www.ceskatelevize.cz/ivysilani/)
+* Nova Voyo.cz (http://voyo.nova.cz/)
+* Show Jana Krause (http://www.iprima.cz/showjanakrause/videoarchiv)
+* TV Barrandov Archív (http://barrandov.tv/video)
+* TV Prima Videoarchiv (http://www.iprima.cz/videoarchiv/)
+
+Použití
+-------
+
+1. Najdi si v archivu pořad, který chceš stáhnout
+
+2. Spusť `tv-dl` a jako parametr mu dej URL stránky s pořadem, například:
+<pre>
+    ./tv-dl http://www.ceskatelevize.cz/ivysilani/10348527168-jak-na-ryby-s-rudou-hrusinskym/211562220200013-jak-na-ryby-s-rudou-hrusinskym/
+</pre>
+3. Skript stáhne pořad v nejvyšší možné kvalitě.
+
+
+### Vypsání seznamu kvalit/videí
+
+Pro vypsání možných kvalit spusť `tv-dl` s parametry ve tvaru:
+
+    ./tv-dl -q list URL
+
+Pro stažení poté použij místo slova list jeden z identifikátorů, který bude vypsán v levém sloupci.
+Obdobně probíhá výběr videa ze stránky u Show Jana krause (parametr `-m`).
+
+### Volby
+
+<pre>
+  -g, --get-url         nestahuje, použe vypíše URL adresu videa (dá se použít v některých přehrávačích)
+  -q QUALITY, --quality QUALITY
+                        nastavuje kvalitu (list pro vypsání možností)
+  -m MOVIE, --movie MOVIE
+                        vybírá video ze stránky (list pro vypsání možností)
+  -o OUTPUT, --output OUTPUT
+                        nastavuje výstupní soubor
+</pre>
+
+### Skript tv-play
+
+Tento skript nestahuje, ale přímo spustí přehrávač s daným pořadem. Přijímá stejné parametry jako `tv-dl`. Jako výchozí přehrávač se používá `totem`.
+
+Výběr jiného přehrávače je možný vytvořením souboru `~/.tv-play` s obsahem ve tvaru `player=příkaz_pro_spuštění_přehrávače`
+Bohužel to asi funguje jenom s totemem...
