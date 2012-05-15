@@ -55,7 +55,7 @@ class CtEngine:
         self.jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
         self.opener.addheaders = [('User-agent', 'Mozilla/5.0'),
-        ('x-client', '127.0.0.1') ]
+        ('x-addr', '127.0.0.1') ]
         urllib.request.install_opener(self.opener)
         
         self.b_page = urlopen(url).read()  # .decode('utf-8')
