@@ -4,7 +4,7 @@
 
 __author__ = "Jakub Lužný"
 __desc__ = "ČT (iVysílání)"
-__url__ = r"http://www\.ceskatelevize\.cz/(porady|ivysilani)/.+"
+__url__ = r"https?://www\.ceskatelevize\.cz/(porady|ivysilani)/.+"
 
 import re,os.path, urllib.request, urllib.parse, json, http.cookiejar, logging
 import xml.etree.ElementTree as ElementTree

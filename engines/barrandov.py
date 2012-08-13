@@ -2,7 +2,7 @@
 #
 __author__ = "Jakub Lužný"
 __desc__ = "TV Barrandov (Video archív)"
-__url__ = r"http://(www.)?barrandov\.tv/(\d+)-.+"
+__url__ = r"https?://(www.)?barrandov\.tv/(\d+)-.+"
 
 import re,os.path
 import xml.etree.ElementTree as ElementTree

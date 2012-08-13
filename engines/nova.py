@@ -3,7 +3,7 @@
 # založeno na původním nova-dl
 __author__ = "Jakub Lužný"
 __desc__ = "Nova (VOYO)"
-__url__ = r"http://voyo\.nova\.cz/.+"
+__url__ = r"https?://voyo\.nova\.cz/.+"
 
 import re,os.path, hashlib, base64
 import xml.etree.ElementTree as ElementTree

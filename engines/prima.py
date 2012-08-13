@@ -2,7 +2,7 @@
 #
 __author__ = "Jakub Lužný"
 __desc__ = "TV Prima Videoarchiv"
-__url__ = r"http://play\.iprima\.cz/.*"
+__url__ = r"https?://play\.iprima\.cz/.*"
 
 import re,os.path,random,math,logging
 import xml.etree.ElementTree as ElementTree

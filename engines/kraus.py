@@ -2,7 +2,7 @@
 #
 __author__ = "Jakub Lužný"
 __desc__ = "Show Jana Krause"
-__url__ = r"http://www\.iprima\.cz/showjanakrause/videoarchiv.*"
+__url__ = r"https?://www\.iprima\.cz/showjanakrause/videoarchiv.*"
 
 import re
 from urllib.request import urlopen,Request
