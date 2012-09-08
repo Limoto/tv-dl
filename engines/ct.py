@@ -116,7 +116,8 @@ class CtEngine:
         base = self.movie.get('base')
         src = video.get('src')
         filename = os.path.basename( src)[:-3] + 'flv'
-        app = urlparse(base).path[1:]
+        parsedurl = urlparse(base)
+        app = parsedurl.path[1:] + '?' + parsedurl.query
 
         # rtmpdump --live kvůli restartům - viz http://www.abclinuxu.cz/blog/pb/2011/5/televize-9-ctstream-3#18
         return ('rtmp', filename, { 'url': base, 'playpath': src, 'app' : app, 'rtmpdump_args' : '--live'} )
