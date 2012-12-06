@@ -59,6 +59,8 @@ class PrimaEngine:
             playpath = lq
         else:
             playpath = hq
+            
+        playpath += '.mp4'
 
         playerUrl = 'http://embed.livebox.cz/iprimaplay/player-embed-v2.js?__tok{}__={}'.format(
                          math.floor(random.random()*1073741824),
@@ -67,7 +69,7 @@ class PrimaEngine:
         req = Request(playerUrl, None, {'Referer' : self.url} )
         player = urlopen(req).read().decode('utf-8')
         
-        baseUrl = ''.join( re.findall( r"embed\['stream'\] = '(.+?)'.+'(\?auth=.+?)';", player)[0] )
+        baseUrl = ''.join( re.findall( r"embed\['stream'\] = '(.+?)'.+'(\?auth=)'.+'(.+?)';", player)[1] )
 
         return ("rtmp", playpath[:-3]+'flv' , { 'url' : baseUrl+'/'+playpath,
                                      'rtmpdump_args' : '--live'})
