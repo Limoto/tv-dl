@@ -60,8 +60,6 @@ class PrimaEngine:
         else:
             playpath = hq
             
-        playpath += '.mp4'
-
         playerUrl = 'http://embed.livebox.cz/iprimaplay/player-embed-v2.js?__tok{}__={}'.format(
                          math.floor(random.random()*1073741824),
                          math.floor(random.random()*1073741824))
