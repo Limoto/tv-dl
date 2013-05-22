@@ -48,10 +48,9 @@ class NovaEngine:
         #datestring = d.strftime("%Y%m%d%H%M%S")
         datestring = urlopen("http://tn.nova.cz/lbin/time.php").read().decode('utf-8')[0:14]
         
-        #šílenej hash... dostal jsem se k němu pomocí http://www.showmycode.com/ na 13-flowplayer.nacevi-3.1.5-02-002.swf
-
+        
         m = hashlib.md5()
-        m.update("nova-vod|{}|{}|chttvg.jkfrwm57".format(self.media_id, datestring ).encode('utf-8'))
+        m.update("nova-vod|{}|{}|bae8ca04b7d23ab2d62968d2ea54".format(self.media_id, datestring ).encode('utf-8'))
         base64FromBA = base64.b64encode(m.digest() ) #, " /".encode('utf-8'))
         
         get = urlencode( [ ('t', datestring),
