@@ -8,7 +8,7 @@ __url__ = r"https?://www\.ceskatelevize\.cz/(porady|ivysilani)/.+"
 
 import re,os.path, urllib.request, urllib.parse, json, http.cookiejar, logging
 import xml.etree.ElementTree as ElementTree
-from urllib.parse import urlparse
+from urllib.parse import urlparse, unquote
 
 log = logging.getLogger()
 
@@ -67,8 +67,8 @@ class CtEngine:
         data = urllib.parse.urlencode( data, 'utf-8')
         req = urllib.request.Request('http://www.ceskatelevize.cz/ajax/playlistURL.php', bytes(data, 'utf-8') )
 
-        pl_url = urlopen(req).read().decode('utf-8')
-
+        pl_url = unquote( urlopen(req).read().decode('utf-8') )
+        
         self.playlist = urlopen(pl_url).read().decode('utf-8')
         self.getMovie()
         self.videos = self.movie.findall('video')
