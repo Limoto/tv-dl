@@ -53,6 +53,7 @@ class PrimaEngine:
         
         hq = re.findall( r"'hq_id':'(.+?)'", self.page)[0]
         lq = re.findall( r"'lq_id':'(.+?)'", self.page)[0]
+        zoneGEO = re.findall( r"'zoneGEO':(.+?),", self.page)[0]
         
         playpath = ""
         if quality == "low":
@@ -68,6 +69,9 @@ class PrimaEngine:
         player = urlopen(req).read().decode('utf-8')
         
         baseUrl = ''.join( re.findall( r"embed\['stream'\] = '(.+?)'.+'(\?auth=)'.+'(.+?)';", player)[1] )
+
+        if int(zoneGEO) != 0:
+            baseUrl = baseUrl.replace("token", "token_"+zoneGEO)
 
         return ("rtmp", playpath[:-3]+'flv' , { 'url' : baseUrl+'/'+playpath,
                                      'rtmpdump_args' : '--live'})
