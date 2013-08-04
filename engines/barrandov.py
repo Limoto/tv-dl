@@ -2,7 +2,7 @@
 #
 __author__ = "Jakub Lužný"
 __desc__ = "TV Barrandov (Video archív)"
-__url__ = r"https?://(www.)?barrandov\.tv/(\d+)-.+"
+__url__ = r"https?://(www.)?barrandov\.tv/video/(\d+)-.+"
 
 import re,os.path
 import xml.etree.ElementTree as ElementTree
@@ -13,19 +13,15 @@ class BarrandovEngine:
     def __init__(self, url):
         id = re.findall(__url__, url)[0][1]
         self.page = urlopen(url).read().decode('utf-8')
-        self.playlist = ElementTree.fromstring( urlopen('http://www.barrandov.tv/special/videoplayerdata/'+id).read().decode('utf-8') )
 
     def movies(self):        
-        return [ ('0', re.findall(r'<title>(.+?) -  Video Archív - TV Barrandov', self.page)[0]) ]
+        return [ ('0', re.findall(r'<meta property="og:title" content="(.*) \| Barrandov', self.page)[0]) ]
   
     def qualities(self):
         q = []
-                
-        if self.playlist.find('hashdquality').text == 'true':
-            q.append( ('hd', 'HD' ) )
 
-        if self.playlist.find('hasquality').text == 'true':
-            q.append( ('high', 'Vysoká' ) )
+        if "720p HD" in re.findall(r"label: \"(.+?)\"", self.page):
+            q.append( ('hd', 'HD' ) )
         
         q.append( ('low', 'Nízká') )
 
@@ -35,18 +31,10 @@ class BarrandovEngine:
         if not quality:
             quality = self.qualities()[0][0]
         
-        playpath = self.playlist.find('streamname').text
-        hostname = self.playlist.find('hostname').text
-        if quality == 'high':
-            playpath = playpath.replace('500', '1000')
-        elif quality == 'hd':
-            playpath = playpath.replace('500', 'HD')
-        
-        rtmp = 'rtmpe://' + hostname + '/' + playpath
-  
-        
-        filename = os.path.basename(playpath)[4:-3] + 'flv'
+        playpath = re.findall(r"file: \"(.+?)\",", self.page)[0] #/video/2013/06/13102000060046_600_wide.mp4
 
-        return ("rtmp", filename , { 'url' : rtmp,
-                                     'token' : '#ed%h0#w@1',
-                                     'rtmpdump_args' : '--live' } )
+        if quality == 'hd':
+            playpath = playpath.replace('600_wide', 'HD_wide')
+
+        filename = os.path.basename(playpath)
+        return ("http", filename, {"url" : "http://www.barrandov.tv"+playpath})

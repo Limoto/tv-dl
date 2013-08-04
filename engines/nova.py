@@ -39,7 +39,7 @@ class NovaEngine:
         return q
 
     def movies(self):        
-        return [ ('0', re.findall(r'<title>(.+?) - Voyo.cz', self.page)[0]) ]
+        return [ ('0', re.findall(r'<meta property="og:title" content="(.+?)"/>', self.page)[0]) ]
 
     def get_playlist(self):        
         self.media_id = re.search(r'mainVideo = new mediaData\(\d+, \d+, (\d+),', self.page ).group(1)
