@@ -2,7 +2,7 @@
 #
 __author__ = "Jakub Lužný"
 __desc__ = "TV Prima Videoarchiv"
-__url__ = r"https?://play\.iprima\.cz/.*"
+__url__ = r"https?://play\.iprima\.cz/.*/.*"
 
 import re,os.path,random,math,logging
 import xml.etree.ElementTree as ElementTree
@@ -51,9 +51,9 @@ class PrimaEngine:
             
     def download_rtmp(self, quality):
         
-        hq = re.findall( r"'hq_id':'(.+?)'", self.page)[0]
-        lq = re.findall( r"'lq_id':'(.+?)'", self.page)[0]
-        zoneGEO = re.findall( r"'zoneGEO':(.+?),", self.page)[0]
+        hq = re.findall( r'"hq_id":"(.+?)"', self.page)[0]
+        lq = re.findall( r'"lq_id":"(.+?)"', self.page)[0]
+        zoneGEO = re.findall( r'"zoneGEO":(.+?),', self.page)[0]
         
         playpath = ""
         if quality == "low":
