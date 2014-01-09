@@ -65,7 +65,7 @@ class CtEngine:
         data = json.loads(data)
         data = flatten(data['options'], 'options')
         data = urllib.parse.urlencode( data, 'utf-8')
-        req = urllib.request.Request('http://www.ceskatelevize.cz/ajax/playlistURL.php', bytes(data, 'utf-8') )
+        req = urllib.request.Request('http://www.ceskatelevize.cz/ajax/getPlaylistURL.php', bytes(data, 'utf-8') )
 
         pl_url = unquote( urlopen(req).read().decode('utf-8') )
         
