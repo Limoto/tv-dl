@@ -31,6 +31,9 @@ class BarrandovEngine:
         if not quality:
             quality = self.qualities()[0][0]
         
+        if re.search('<title>PRÉMIOVÝ ARCHIV BARRANDOV TV', self.page):
+            return ('error', 'Nelze stahovat videa z prémiového archivu TV BARRANDOV')
+        
         playpath = re.findall(r"file: \"(.+?)\",", self.page)[0] #/video/2013/06/13102000060046_600_wide.mp4
 
         if quality == 'hd':

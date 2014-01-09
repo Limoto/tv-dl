@@ -41,7 +41,7 @@ class TVDownloader:
         d = e.download(self.args.quality, self.args.movie)
     
         if d[0] == 'error':
-            log.error("Chyba: {}".format(d[1]), file=sys.stderr)
+            log.error("Chyba: {}".format(d[1]))
             return False
     
         if self.args.get_url:
