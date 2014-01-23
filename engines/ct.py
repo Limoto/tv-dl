@@ -72,6 +72,11 @@ class CtEngine:
         self.playlist = urlopen(pl_url).read().decode('utf-8')
         self.getMovie()
         self.videos = self.movie.findall('video')
+        
+        # setridime podle kvality: z popisku nechame jenom cislo
+        # kvuli audio-description verzi (label AD) pridame 0, abychom to mohli tridit jako cisla
+        self.videos = sorted(self.videos, key=lambda k: int(re.sub(r"\D", "", k.get('label')+"0")), reverse=True)
+        
         if len(self.videos) == 0:
             raise ValueError('Není k dispozici žádná kvalita videa.')
         
@@ -91,7 +96,7 @@ class CtEngine:
                     self.subtitles = s.text
 
     def qualities(self):
-        return ([('srt', 'Titulky')] if self.subtitles is not None else [] ) + [( v.get('label'), v.get('label') ) for v in self.videos]
+        return [( v.get('label'), v.get('label') ) for v in self.videos] + ([('srt', 'Titulky')] if self.subtitles is not None else [] )
       
     def movies(self):        
         return [ ('0', re.findall(b'<title>(.+?) &mdash;', self.b_page)[0].decode('utf-8')) ]
