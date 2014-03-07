@@ -54,22 +54,35 @@ class CtEngine:
         url = url.replace('/porady/', '/ivysilani/').replace('/video/', '')
         self.jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(self.jar))
-        self.opener.addheaders = [('User-agent', 'Mozilla/5.0'),
-        ('x-addr', '127.0.0.1') ]
+        self.opener.addheaders = [
+            ('User-agent', 'Mozilla/5.0'),
+            ('x-addr', '127.0.0.1'),
+            ('Referer', url)
+        ]
         urllib.request.install_opener(self.opener)
         
         self.b_page = urlopen(url).read()  # .decode('utf-8')
 
-        data = re.findall(b"callSOAP\((.+?)\);", self.b_page)[0]
+        #get playlist URL first
+        data = re.findall(b"getPlaylistUrl\((.+?]), request", self.b_page)[0]
         data = data.decode('utf-8')
         data = json.loads(data)
-        data = flatten(data['options'], 'options')
+        data = data[0]        
+        data = {
+            'playlist[0][type]' : data['type'],
+            'playlist[0][id]' : data['id'],
+            'requestUrl' : urlparse(url).path,
+            'requestSource' : 'iVysilani'
+        }
         data = urllib.parse.urlencode( data, 'utf-8')
-        req = urllib.request.Request('http://www.ceskatelevize.cz/ajax/videoURL.php', bytes(data, 'utf-8') )
-
-        pl_url = unquote( urlopen(req).read().decode('utf-8') )
-        
-        self.playlist = urlopen(pl_url).read().decode('utf-8')
+        header = { 
+            "Content-type": "application/x-www-form-urlencoded"        
+        }
+        req = urllib.request.Request('http://www.ceskatelevize.cz/ivysilani/ajax/get-playlist-url', bytes(data, 'utf-8'), header )
+        data = json.loads(urlopen(req).read().decode('utf-8'))
+        url = urllib.parse.unquote(data['url'])
+                
+        self.playlist = urlopen(url).read().decode('utf-8')
         self.getMovie()
         self.videos = self.movie.findall('video')
         
