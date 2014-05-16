@@ -97,7 +97,8 @@ class CtEngine:
         xml = ElementTree.fromstring(self.playlist) 
 
         for e in xml.findall('smilRoot/body/switchItem'):
-            if not 'AD'  in e.get('id'):
+            i = e.get('id')
+            if not ('AD' in i or 'BO' in i):
                 self.movie = e
                 break
         
